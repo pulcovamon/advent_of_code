@@ -1,56 +1,47 @@
 '''
-Advent calendar day 07 task 1 (does not work)
+Advent calendar day 07 task 1 try 2
 '''
+from collections import defaultdict
 
-def day_07_1(file_name):
-    with open(file_name) as txt_file:
-        lines = txt_file.readlines()
 
-        directories = {}
-        file_system = []
-        ls = False
+def file_system(file_name):
+    with open(file_name) as throught_dir:
+        steps = throught_dir.readlines()
 
-        for i in range(len(lines)):
-            if lines[i].strip() == '$ ls':
-                ls = True
-            elif lines[i][0:4].strip() == '$ cd':
-                ls = False
-                if lines[i][5:-1] != '..':
-                    name_dir = ''.join(lines[i][5:-1]).strip()
-                    file_system.append(name_dir)
-                    directories[name_dir] = []
+        dir_dict = {}
+        current_path = []
+        
+
+        for line in steps:
+            line = line.strip().split()
+            if line[1] == 'cd':
+                if line[2] == '..':
+                    current_path.pop()
+                elif line[2] == '/':
+                    name = 'root'
+                    current_path = [name]
+                    if name not in dir_dict:
+                        dir_dict[name] = 0
                 else:
-                    file_system.pop()
-            elif ls:
-                name = lines[i].strip()
-                directories[name_dir].append(name)
+                    name = '/'.join(current_path) + line[2]
+                    current_path.append(name)
+                    if name not in dir_dict:
+                        dir_dict[name] = 0
+            elif line[0].isdigit():
+                file_size = int(line[0])
+                for item in current_path:
+                    dir_dict[item] += file_size
 
-        del directories['/']
-            
+    keys = [key for key in dir_dict if dir_dict[key] <= 100000]
+    sizes = [dir_dict[key] for key in keys]
 
-        sizes = {}
-        complete = False
-
-        while not complete:
-            complete = True
-            for directory in directories:
-                sizes[directory] = 0
-                for item in directories[directory]:
-                    if item[0:3] == 'dir':
-                        if item[4] in sizes:
-                            print(item[4])
-                            sizes[directory] += sizes[item[4]]
-                        else:
-                            complete = False
-                    else:
-                        size = int(''.join([char for char in item if char.isdigit()]))
-                        sizes[directory] += size
+    sum_sizes = sum(sizes)
 
 
-    return sizes
+    return sum_sizes
 
 
 
 
 if __name__ == '__main__':
-    print(day_07_1('data_07.txt'))
+    print(file_system('data_07.txt'))

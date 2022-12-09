@@ -31,13 +31,16 @@ def file_system(file_name):
                 for item in current_path:
                     dir_dict[item] += file_size
 
-    keys = [key for key in dir_dict if dir_dict[key] <= 100000]
+    keys = [key for key in dir_dict if dir_dict[key]]
     sizes = [dir_dict[key] for key in keys]
 
-    sum_sizes = sum(sizes)
+    space = 70000000 - max(sizes)
+    required = 30000000 - space
+
+    size = min([size for size in sizes if size > required])
 
 
-    return sum_sizes
+    return size
 
 
 
